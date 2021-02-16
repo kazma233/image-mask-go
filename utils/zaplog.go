@@ -9,13 +9,12 @@ import (
 )
 
 const (
-	logLogP  = "logs/high/log.log"
-	highLogP = "logs/low/log.log"
+	highLogP = "logs/high/log.log"
+	lowLogP  = "logs/low/log.log"
 )
 
 var (
-	// Llogger log
-	Llogger *zap.Logger
+	core zapcore.Core
 )
 
 func init() {
@@ -41,21 +40,27 @@ func init() {
 	}
 
 	lowLogger := &lumberjack.Logger{
-		Filename:   logLogP,
+		Filename:   lowLogP,
 		MaxSize:    100,
 		MaxBackups: 10,
 		MaxAge:     30,
 		Compress:   false,
 	}
 
-	core := zapcore.NewTee(
+	core = zapcore.NewTee(
 		zapcore.NewCore(consoleEncoder, os.Stdout, nonePriority),
 
 		zapcore.NewCore(fileEncoder, zapcore.AddSync(highLogger), highPriority),
 		zapcore.NewCore(fileEncoder, zapcore.AddSync(lowLogger), lowPriority),
 	)
+}
 
-	Llogger = zap.New(core)
+// GetLog 获取日志输出对象
+func GetLog() *zap.Logger {
+	return zap.New(core)
+}
 
-	defer Llogger.Sync()
+// GetSugaredLogger 获取包装日志输出对象
+func GetSugaredLogger() *zap.SugaredLogger {
+	return zap.New(core).Sugar()
 }

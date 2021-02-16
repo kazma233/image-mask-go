@@ -31,6 +31,7 @@ const (
 )
 
 var (
+	log       = utils.GetLog()
 	fontStyle = map[imgFont]*opentype.Font{}
 )
 
@@ -38,7 +39,7 @@ func init() {
 	fontStyle[Regular] = getFontPanic(regularPath)
 	fontStyle[Medium] = getFontPanic(mediumPath)
 	fontStyle[Bold] = getFontPanic(boldPath)
-	utils.Llogger.Debug("init font info: ", zap.Any("val", fontStyle))
+	log.Debug("init font info: ", zap.Any("val", fontStyle))
 }
 
 // WriteColorMask 在图片上填满色块
@@ -77,12 +78,12 @@ func WriteWordMask(bgImg image.Image, word string, imgFont imgFont, c color.Colo
 func getFontPanic(path string) *opentype.Font {
 	fontFile, err := os.OpenFile(path, os.O_RDONLY, 0755)
 	if err != nil {
-		utils.Llogger.Error("open font file err: ", zap.Error(err))
+		log.Error("open font file err: ", zap.Error(err))
 		return nil
 	}
 	font, err := opentype.ParseReaderAt(fontFile)
 	if err != nil {
-		utils.Llogger.Error("parse font file err: ", zap.Error(err))
+		log.Error("parse font file err: ", zap.Error(err))
 		panic(err)
 	}
 

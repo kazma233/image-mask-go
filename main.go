@@ -35,6 +35,8 @@ const (
 )
 
 var (
+	// log
+	log = utils.GetLog()
 	// ui
 	a               fyne.App
 	baseWindows     fyne.Window
@@ -51,14 +53,16 @@ var (
 )
 
 func init() {
+
 	p, err := findfont.Find("MSYH.TTC")
 	if err != nil {
-		utils.Llogger.Error("find font error: ", zap.Error(err))
+		log.Error("find font error: ", zap.Error(err))
+		return
 	}
 
 	err = os.Setenv("FYNE_FONT", p)
 	if err != nil {
-		utils.Llogger.Error("set env FYNE_FONT error: ", zap.Error(err))
+		log.Error("set env FYNE_FONT error: ", zap.Error(err))
 	}
 }
 
@@ -128,7 +132,7 @@ func selectExcel() {
 	fileDialg := dialog.NewFileOpen(func(u fyne.URIReadCloser, e error) {
 		fileModalWindows.Hide()
 		if e != nil {
-			utils.Llogger.Error(e.Error())
+			log.Error(e.Error())
 		} else if u != nil {
 			showLabel.SetText(u.URI().Path())
 		}
@@ -161,7 +165,7 @@ func processImage() {
 			65, 100, fixed.P(250, position),
 		)
 		if err != nil {
-			utils.Llogger.Error("写出文字失败: ", zap.Error(err))
+			log.Error("写出文字失败: ", zap.Error(err))
 		}
 		position += size.Floor()
 		bgImg = _bgImg
