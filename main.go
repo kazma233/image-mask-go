@@ -3,11 +3,13 @@ package main
 import (
 	"image"
 	"image-mask/img"
+	"image-mask/resource"
 	"image-mask/utils"
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -23,10 +25,6 @@ import (
 )
 
 const (
-	// base image
-	bgPath = "resource/img/bg.png"
-	// chara
-	charaPath = "resource/img/img_chara_1.png"
 	// size
 	baseWidth  = 400
 	baseHeight = 200
@@ -36,7 +34,7 @@ const (
 
 var (
 	// log
-	log = utils.GetLog()
+	log = utils.GetSugaredLogger()
 	// ui
 	a               fyne.App
 	baseWindows     fyne.Window
@@ -53,16 +51,17 @@ var (
 )
 
 func init() {
+	for _, fn := range findfont.List() {
+		lowerFn := strings.ToLower(fn)
+		if strings.Contains(lowerFn, "pingfang") || strings.Contains(lowerFn, "msyh") {
+			log.Debugf("find font: %s", fn)
+			err := os.Setenv("FYNE_FONT", fn)
+			if err != nil {
+				log.Errorf("set env FYNE_FONT error: %v", err)
+			}
 
-	p, err := findfont.Find("MSYH.TTC")
-	if err != nil {
-		log.Error("find font error: ", zap.Error(err))
-		return
-	}
-
-	err = os.Setenv("FYNE_FONT", p)
-	if err != nil {
-		log.Error("set env FYNE_FONT error: ", zap.Error(err))
+			break
+		}
 	}
 }
 
@@ -143,13 +142,13 @@ func selectExcel() {
 
 func processImage() {
 	// open bg
-	bgImg, err := imaging.Open(bgPath)
+	bgImg, err := imaging.Open(resource.Root + resource.BG)
 	if err != nil {
 		panic(err)
 	}
 
 	// open chara
-	charaImg, err := imaging.Open(charaPath)
+	charaImg, err := imaging.Open(resource.Root + resource.Chara1)
 	if err != nil {
 		panic(err)
 	}
@@ -160,7 +159,7 @@ func processImage() {
 	for _, r := range "我怎么知道ABC" {
 		_bgImg, size, err := img.WriteWordMask(
 			bgImg,
-			string(r), img.Regular,
+			string(r), resource.GetFont(resource.Regular),
 			color.RGBA{R: utils.UColor(), G: utils.UColor(), B: utils.UColor(), A: 255},
 			65, 100, fixed.P(250, position),
 		)
