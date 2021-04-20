@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片处理</title>
+</head>
+
+<body>
+    <input id="box_x" name="x" placeholder="输入方块x坐标"><br />
+    <input id="box_y" name="y" placeholder="输入方块y坐标"><br />
+    <input id="chara_x" name="x" placeholder="输入角色x坐标"><br />
+    <input id="chara_y" name="y" placeholder="输入角色y坐标"><br />
+    <button id="process">提交</button><br />
+    <img id="img" alt="处理后将会显示图片" src="" />
+
+</body>
+
+<script>
+    window.onload = function () {
+        document.getElementById("process").addEventListener("click", function () {
+            document.getElementById("img").setAttribute(
+                "src",
+                "./img" +
+                "?box_x=" + document.getElementById("box_x").value +
+                "&box_y=" + document.getElementById("box_y").value +
+                "&chara_x=" + document.getElementById("chara_x").value +
+                "&chara_y=" + document.getElementById("chara_y").value + 
+                "&rand=" + Math.random()
+            )
+        });
+    }
+</script>
+
+</html>
