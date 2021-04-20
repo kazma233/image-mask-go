@@ -1,5 +1,5 @@
 # image-mask-go
 
-a image mask using golang and fyne.
+a image mask.
 
 ![img](./example.png)
