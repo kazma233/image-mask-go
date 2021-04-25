@@ -33,26 +33,26 @@ func main() {
 	})
 
 	router.GET("/img", func(c *gin.Context) {
-		imangeInfo := &entity.ImageInfo{}
-		if err := c.BindQuery(&imangeInfo); err != nil {
+		imageInfo := &entity.ImageInfo{}
+		if err := c.BindQuery(&imageInfo); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		log.Info("image info %s", imangeInfo)
+		log.Info("image info %s", imageInfo)
 
-		img, err := processImage(imangeInfo)
+		img, err := processImage(imageInfo)
 		if err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		buf := new(bytes.Buffer)
-		jpeg.Encode(buf, img, nil)
-		c.Writer.Write(buf.Bytes())
+		_ = jpeg.Encode(buf, img, nil)
+		_, _ = c.Writer.Write(buf.Bytes())
 	})
 
-	router.Run(":9000")
+	log.Errorf("服务运行：%s", router.Run(":9000"))
 }
 
 func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
@@ -71,8 +71,8 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 
 	// Write Font
 	position := 100
-	for _, r := range "中文间距以及English Space" {
-		draw, err := utils.PreWordMask(
+	for _, r := range "中文 English" {
+		fontFace, err := utils.PreWordMask(
 			entity.WordMaskPreInfo{
 				Word: string(r),
 				Font: resource.GetFont(resource.Regular),
@@ -87,10 +87,10 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 		}
 
 		_bgImg, err := utils.WriteWordMask(
+			fontFace,
 			entity.WordMaskInfo{
-				BgImg:  img,
-				Drawer: draw,
-				Word:   string(r),
+				BgImg: img,
+				Word:  string(r),
 				ColorPoint: entity.ColorPoint{
 					C:  color.RGBA{R: utils.UColor(), G: utils.UColor(), B: utils.UColor(), A: 255},
 					Pt: fixed.P(250, position),
@@ -110,12 +110,9 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 		entity.WriteColorInfo{
 			BgImage: img,
 			ColorBoxInfo: entity.ColorBox{
-				Box: entity.Box{
-					Shape: entity.Shape{
-						Width: 100, Hight: 100,
-					},
-					Point: image.Pt(imageInfo.BoxX, imageInfo.BoxY),
-				},
+				Width: 100,
+				High:  100,
+				Point: image.Pt(imageInfo.BoxX, imageInfo.BoxY),
 				Color: color.RGBA{R: utils.UColor(), G: utils.UColor(), B: utils.UColor(), A: 255},
 			},
 		},

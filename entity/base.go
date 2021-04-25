@@ -10,7 +10,7 @@ import (
 type (
 	Shape struct {
 		Width int
-		Hight int
+		High  int
 	}
 
 	Box struct {
@@ -24,7 +24,9 @@ type (
 	}
 
 	ColorBox struct {
-		Box
+		Width int
+		High  int
+		image.Point
 		color.Color
 	}
 )

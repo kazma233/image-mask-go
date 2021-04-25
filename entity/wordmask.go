@@ -4,13 +4,11 @@ import (
 	"image"
 	"image/color"
 
-	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
 
 type WordMaskInfo struct {
 	BgImg      image.Image // 背景图
-	Drawer     font.Drawer // 写文字对象
 	Word       string      // 文字
 	ColorPoint             // 颜色 位置
 }

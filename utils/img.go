@@ -18,34 +18,25 @@ var (
 func WriteColorMask(info entity.WriteColorInfo) image.Image {
 	return imaging.Paste(
 		info.BgImage,
-		imaging.New(info.ColorBoxInfo.Width, info.ColorBoxInfo.Hight, info.ColorBoxInfo.Color),
+		imaging.New(info.ColorBoxInfo.Width, info.ColorBoxInfo.High, info.ColorBoxInfo.Color),
 		info.ColorBoxInfo.Point,
 	)
 }
 
 // PreWordMask 获取文字水印
-func PreWordMask(info entity.WordMaskPreInfo) (font.Drawer, error) {
-	face, err := opentype.NewFace(info.Font, &opentype.FaceOptions{
+func PreWordMask(info entity.WordMaskPreInfo) (font.Face, error) {
+	return opentype.NewFace(info.Font, &opentype.FaceOptions{
 		Size:    info.Size,
 		DPI:     info.Dpi,
 		Hinting: font.HintingNone,
 	})
-	if err != nil {
-		return font.Drawer{}, err
-	}
-
-	drawer := font.Drawer{
-		Face: face,
-	}
-
-	return drawer, nil
 }
 
 // WriteWordMask 写文字水印
-func WriteWordMask(info entity.WordMaskInfo) (image.Image, error) {
-	bgImg := info.BgImg
-	drawer := info.Drawer
+func WriteWordMask(face font.Face, info entity.WordMaskInfo) (image.Image, error) {
+	drawer := font.Drawer{Face: face}
 
+	bgImg := info.BgImg
 	dstImg := image.NewRGBA(bgImg.Bounds())
 	drawer.Dst = dstImg
 	drawer.Dot = info.Pt
@@ -58,7 +49,7 @@ func WriteWordMask(info entity.WordMaskInfo) (image.Image, error) {
 
 // WriteFontCenter 写出文字（中间）
 func WriteFontCenter(info entity.WordMaskCenterInfo) (image.Image, error) {
-	drawer, err := PreWordMask(
+	fontFace, err := PreWordMask(
 		entity.WordMaskPreInfo{
 			Word: info.Word,
 			Font: info.Font,
@@ -66,19 +57,22 @@ func WriteFontCenter(info entity.WordMaskCenterInfo) (image.Image, error) {
 			Dpi:  info.Dpi,
 		},
 	)
-	fSize := drawer.MeasureString(info.Word)
+
 	if err != nil {
 		return nil, err
 	}
+
+	drawer := font.Drawer{Face: fontFace}
+	fSize := drawer.MeasureString(info.Word)
 
 	log.Debugf("fSize: %v", fSize)
 
 	w := (info.Width - fSize.Floor()) / 2
 	wordMaskImage, err := WriteWordMask(
+		fontFace,
 		entity.WordMaskInfo{
-			BgImg:  info.BgImg,
-			Drawer: drawer,
-			Word:   info.Word,
+			BgImg: info.BgImg,
+			Word:  info.Word,
 			ColorPoint: entity.ColorPoint{
 				C:  info.C,
 				Pt: fixed.P(w, info.Y),
