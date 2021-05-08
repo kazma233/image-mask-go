@@ -39,7 +39,7 @@ func WriteWordMask(face font.Face, info entity.WordMaskInfo) (image.Image, error
 	bgImg := info.BgImg
 	dstImg := image.NewRGBA(bgImg.Bounds())
 	drawer.Dst = dstImg
-	drawer.Dot = info.Pt
+	drawer.Dot = fixed.P(info.X, info.Y)
 	drawer.Src = image.NewUniform(info.C)
 
 	drawer.DrawString(info.Word)
@@ -74,8 +74,9 @@ func WriteFontCenter(info entity.WordMaskCenterInfo) (image.Image, error) {
 			BgImg: info.BgImg,
 			Word:  info.Word,
 			ColorPoint: entity.ColorPoint{
-				C:  info.C,
-				Pt: fixed.P(w, info.Y),
+				C: info.C,
+				X: w,
+				Y: info.Y,
 			},
 		},
 	)

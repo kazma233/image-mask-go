@@ -13,8 +13,6 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
-	"golang.org/x/image/math/fixed"
 )
 
 var (
@@ -70,7 +68,7 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 	img = imaging.Overlay(img, charaImg, image.Pt(imageInfo.CharaX, imageInfo.CharaY), 1)
 
 	// Write Font
-	position := 100
+	var position int = 100
 	for _, r := range "中文 English" {
 		fontFace, err := utils.PreWordMask(
 			entity.WordMaskPreInfo{
@@ -82,7 +80,7 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 		)
 
 		if err != nil {
-			log.Error("写出文字失败: ", zap.Error(err))
+			log.Errorf("写出文字失败: %v", err)
 			break
 		}
 
@@ -92,13 +90,14 @@ func processImage(imageInfo *entity.ImageInfo) (img image.Image, err error) {
 				BgImg: img,
 				Word:  string(r),
 				ColorPoint: entity.ColorPoint{
-					C:  color.RGBA{R: utils.UColor(), G: utils.UColor(), B: utils.UColor(), A: 255},
-					Pt: fixed.P(250, position),
+					C: color.RGBA{R: utils.UColor(), G: utils.UColor(), B: utils.UColor(), A: 255},
+					X: 250,
+					Y: position,
 				},
 			},
 		)
 		if err != nil {
-			log.Error("写出文字失败: ", zap.Error(err))
+			log.Errorf("写出文字失败: %s", err)
 			break
 		}
 		position += 100

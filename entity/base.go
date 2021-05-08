@@ -3,8 +3,6 @@ package entity
 import (
 	"image"
 	"image/color"
-
-	"golang.org/x/image/math/fixed"
 )
 
 type (
@@ -19,8 +17,9 @@ type (
 	}
 
 	ColorPoint struct {
-		C  color.Color
-		Pt fixed.Point26_6
+		X int
+		Y int
+		C color.Color
 	}
 
 	ColorBox struct {

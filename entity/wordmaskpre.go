@@ -3,7 +3,6 @@ package entity
 import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
-	"golang.org/x/image/math/fixed"
 )
 
 type WordMaskPreInfo struct {
@@ -14,6 +13,7 @@ type WordMaskPreInfo struct {
 }
 
 type WordMaskPreResult struct {
-	Draw   font.Drawer   // 绘制文字的对象
-	FixInt fixed.Int26_6 // signed 26.6 fixed-point number
+	Draw font.Drawer // 绘制文字的对象
+	X    int
+	Y    int
 }
